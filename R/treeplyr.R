@@ -27,8 +27,10 @@ make.treedata <- function(tree, data, name_column="detect") {
   }
   if(name_column==0){
     dat.label <- rownames(data)
-  } 
-  dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(as.character(data[,x])))))
+  }
+  # dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(as.character(data[,x])))))
+  dat <- data
+
   colnames(dat) <- coln
   #dat <- apply(dat, 2, type.convert)
   if(name_column==0){
@@ -75,6 +77,23 @@ select.treedata <- function(tdObject, ...){
   tdObject$dat <- dat
   rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
+}
+
+if (exists('select_')) {
+  #' @export
+  select_.treedata <- function(tdObject, ..., .dots){
+    dots <- lazyeval::all_dots(.dots, ...)
+    vars <- select_vars_(names(tdObject$dat), dots)
+    dat <- tdObject$dat[, vars, drop = FALSE]
+    row.names(dat) <- attributes(tdObject)$tip.label
+    tdObject$dat <- dat
+    return(tdObject)
+  }
+} else {
+  select_ <- function() {}
+
+  #' @export
+  select_.treedata <- function() {}
 }
 
 #' @export
